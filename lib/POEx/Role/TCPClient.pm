@@ -104,10 +104,11 @@ passed directly to SocketFactory.
         (
             POE::Wheel::SocketFactory->new
             (
-                RemoteAddr      => $remote_address,
-                RemotePort      => $remote_port,
-                SuccessEvent    => 'handle_on_connect',
-                FailureEvent    => 'handle_connect_error',
+                RemoteAddress       => $remote_address,
+                RemotePort          => $remote_port,
+                SuccessEvent        => 'handle_on_connect',
+                FailureEvent        => 'handle_connect_error',
+                Reuse               => 1,
             )
         );
     }
@@ -140,7 +141,7 @@ handle_connect_error is the FailureEvent of the SocketFactory
 
     method handle_connect_error(Str $action, Int $code, Str $message) is Event
     {
-        warn "Received listen error: Action $action, Code $code, Message $message"
+        warn "Received connect error: Action $action, Code $code, Message $message"
             if $self->options->{'debug'};
     }
 
