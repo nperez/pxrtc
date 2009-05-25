@@ -76,6 +76,20 @@ for more details.
         }
     );
 
+=attr last_wheel is: rw, isa: WheelID
+
+This holds the last ID created from the handle_on_connect method. Handy if the
+protocol requires client initiation.
+
+=cut
+
+    has last_wheel =>
+    (
+        is          => 'rw',
+        isa         => WheelID,
+        lazy        => 1,
+    );
+
 =attr filter is: rw, isa: Filter
 
 This stores the filter that is used when constructing wheels. It will be cloned
@@ -130,6 +144,7 @@ handle_on_connect is the SuccessEvent of the SocketFactory instantiated in _star
         );
         
         $self->set_wheel($wheel->ID, $wheel);
+        $self->last_wheel($wheel->ID);
         $self->clear_socket_factory
     }
 
