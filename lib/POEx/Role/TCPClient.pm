@@ -87,7 +87,6 @@ protocol requires client initiation.
     (
         is          => 'rw',
         isa         => WheelID,
-        lazy        => 1,
     );
 
 =attr filter is: rw, isa: Filter
