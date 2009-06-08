@@ -170,6 +170,21 @@ handle_socket_error is the ErrorEvent of each POE::Wheel::ReadWrite instantiated
         warn "Received socket error: Action $action, Code $code, Message $message"
             if $self->options->{'debug'};
     }
+
+=method shutdown() is Event
+
+shutdown unequivically terminates the TCPClient by clearing all wheels and 
+aliases, forcing POE to garbage collect the session.
+
+=cut
+
+    method shutdown() is Event
+    {
+        $self->clear_socket_factory;
+        $self->clear_wheels;
+        $self->clear_alias;
+        $self->poe->kernel->alias_remove($_) for $self->poe->kernel->alias_list();
+    }
 }
 
 1;

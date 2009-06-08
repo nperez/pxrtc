@@ -16,8 +16,7 @@ class Client with POEx::Role::TCPClient
     method handle_inbound_data($data, WheelID $id) is Event
     {
         is($data, 'TEST', 'Got inbound data');
-        $self->clear_wheels;
-        $self->clear_socket_factory;
+        $self->yield('shutdown');
     }
 
     before connect(Str :$remote_address, Int :$remote_port) is Event
