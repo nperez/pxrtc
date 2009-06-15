@@ -42,7 +42,7 @@ The POE::Wheel::SocketFactory created in connect is stored here.
         clearer     => 'clear_socket_factory',
     );
 
-=attr wheels metaclass: Collection::Hash, is: rw, isa: HashRef, clearer: clear_wheels
+=attr wheels metaclass: Collection::Hash, isa: HashRef, clearer: clear_wheels
 
 When connections are finished, a POE::Wheel::ReadWrite object is created and 
 stored in this attribute, keyed by WheelID. Wheels may be accessed via the
@@ -62,8 +62,7 @@ for more details.
     has wheels =>
     (
         metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
-        is          => 'rw',
-        isa         => HashRef,
+        isa         => HashRef[Object],
         lazy        => 1,
         default     => sub { {} },
         clearer     => 'clear_wheels',
@@ -103,27 +102,63 @@ for each connection completed.
         default     => sub { POE::Filter::Line->new() }
     );
 
-=method connect(Str :$remote_address, Int :$remote_port) is Event
+=attr connection_tags metaclass: Collection::Hash, is: ro, isa: HashRef[Ref]
 
-connect is used to initiate a connection to a remote source. It accepts two 
-named arguments that both required, remote_address and remote_port. They are 
-passed directly to SocketFactory.
+This stores any arbitrary user data passed to connect keyed by the socket
+factory ID. Handy to match up multiple connects for composers.
+
+    provides    =>
+    {
+        get     => 'get_connection_tag',
+        set     => 'set_connection_tag',
+        delete  => 'delete_connection_tag',
+        count   => 'has_connection_tags',
+        exists  => 'has_connection_tag',
+    }
 
 =cut
 
-    method connect(Str :$remote_address, Int :$remote_port) is Event
+    has connection_tags =>
+    (
+        metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
+        isa         => HashRef[Ref],
+        lazy        => 1,
+        default     => sub { {} },
+        clearer     => 'clear_connection_tags',
+        provides    =>
+        {
+            get     => 'get_connection_tag',
+            set     => 'set_connection_tag',
+            delete  => 'delete_connection_tag',
+            count   => 'has_connection_tags',
+            exists  => 'has_connection_tag',
+        }
+
+    );
+
+=method connect(Str :$remote_address, Int :$remote_port, Ref :$tag?) is Event
+
+connect is used to initiate a connection to a remote source. It accepts two 
+named arguments that both required, remote_address and remote_port. They are 
+passed directly to SocketFactory. If tag is provided, it will be stored in 
+connection_tags and keyed by the socket factory's ID.
+
+=cut
+
+    method connect(Str :$remote_address, Int :$remote_port, Ref :$tag?) is Event
     {
-        $self->socket_factory
+        my $sfactory = POE::Wheel::SocketFactory->new
         (
-            POE::Wheel::SocketFactory->new
-            (
-                RemoteAddress       => $remote_address,
-                RemotePort          => $remote_port,
-                SuccessEvent        => 'handle_on_connect',
-                FailureEvent        => 'handle_connect_error',
-                Reuse               => 1,
-            )
+            RemoteAddress       => $remote_address,
+            RemotePort          => $remote_port,
+            SuccessEvent        => 'handle_on_connect',
+            FailureEvent        => 'handle_connect_error',
+            Reuse               => 1,
         );
+
+        $self->socket_factory($sfactory);
+
+        $self->set_connection_tag($sfactory->ID, $tag) if defined($tag);
     }
 
 =method handle_on_connect(GlobRef $socket, Str $address, Int $port, WheelID $id) is Event

@@ -1,4 +1,4 @@
-use Test::More('tests', 1);
+use Test::More('tests', 7);
 
 use POE;
 use MooseX::Declare;
@@ -19,8 +19,15 @@ class Client with POEx::Role::TCPClient
         $self->yield('shutdown');
     }
 
-    before connect(Str :$remote_address, Int :$remote_port) is Event
+    after shutdown is Event
     {
+        pass('shutdown called');
+    }
+
+    before connect(Str :$remote_address, Int :$remote_port, Ref :$tag?) is Event
+    {
+        pass('before connect called');
+
         $self->server
         (
             POE::Wheel::SocketFactory->new
@@ -32,10 +39,25 @@ class Client with POEx::Role::TCPClient
                 FailureEvent    => 'fail_listen',
             )
         );
+
+        pass('Server socket created');
+    }
+
+    after handle_on_connect(GlobRef $socket, Str $address, Int $port, WheelID $id) is Event
+    {
+        if($self->has_connection_tag($id))
+        {
+            pass('Got tag');
+
+            my $tag = $self->delete_connection_tag($id);
+
+            is_deeply($tag, {one => 1, two => [2]}, 'connection tag is unmunged');
+        }
     }
 
     method accept_socket(GlobRef $socket, Str $address, Int $port, WheelID $id) is Event
     {
+        pass('Socket accept called');
         print $socket "TEST\n";
         $self->clear_server;
     }
@@ -47,7 +69,7 @@ class Client with POEx::Role::TCPClient
     }
 }
 
-Client->new(alias => 'foo');
-POE::Kernel->post('foo', 'connect', remote_address => '127.0.0.1', remote_port => 54444);
+Client->new(alias => 'foo', options => { debug => 1, trace => 1});
+POE::Kernel->post('foo', 'connect', remote_address => '127.0.0.1', remote_port => 54444, tag => {one => 1, two => [2]});
 
 POE::Kernel->run();
