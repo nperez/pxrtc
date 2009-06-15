@@ -28,18 +28,37 @@ it came.
 
     requires 'handle_inbound_data';
 
-=attr socket_factory is: rw, isa: Object, predicate: has_socket_factory, clearer: clear_socket_factory
+=attr socket_factories metaclass: Collection::Hash, isa: HashRef[Object]
 
-The POE::Wheel::SocketFactory created in connect is stored here.
+The POE::Wheel::SocketFactory objects created in connect are stored here and 
+managed via the following provides:
+
+    provides    =>
+    {
+        get     => 'get_socket_factory',
+        set     => 'set_socket_factory',
+        delete  => 'delete_socket_factory',
+        count   => 'has_socket_factories',
+        exists  => 'has_socket_factory',
+    }
 
 =cut
 
-    has socket_factory =>
+    has socket_factories =>
     (
-        is          => 'rw',
-        isa         => Object,
-        predicate   => 'has_socket_factory',
-        clearer     => 'clear_socket_factory',
+        metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
+        isa         => HashRef[Object],
+        lazy        => 1,
+        default     => sub { {} },
+        clearer     => 'clear_socket_factories',
+        provides    =>
+        {
+            get     => 'get_socket_factory',
+            set     => 'set_socket_factory',
+            delete  => 'delete_socket_factory',
+            count   => 'has_socket_factories',
+            exists  => 'has_socket_factory',
+        }
     );
 
 =attr wheels metaclass: Collection::Hash, isa: HashRef, clearer: clear_wheels
@@ -156,7 +175,7 @@ connection_tags and keyed by the socket factory's ID.
             Reuse               => 1,
         );
 
-        $self->socket_factory($sfactory);
+        $self->set_socket_factory($sfactory->ID, $sfactory);
 
         $self->set_connection_tag($sfactory->ID, $tag) if defined($tag);
     }
@@ -179,7 +198,7 @@ handle_on_connect is the SuccessEvent of the SocketFactory instantiated in _star
         
         $self->set_wheel($wheel->ID, $wheel);
         $self->last_wheel($wheel->ID);
-        $self->clear_socket_factory
+        $self->delete_socket_factory($id);
     }
 
 =method handle_connect_error(Str $action, Int $code, Str $message) is Event
@@ -215,7 +234,7 @@ aliases, forcing POE to garbage collect the session.
 
     method shutdown() is Event
     {
-        $self->clear_socket_factory;
+        $self->clear_socket_factories;
         $self->clear_wheels;
         $self->clear_alias;
         $self->poe->kernel->alias_remove($_) for $self->poe->kernel->alias_list();
