@@ -207,9 +207,9 @@ handle_connect_error is the FailureEvent of the SocketFactory
 
 =cut
 
-    method handle_connect_error(Str $action, Int $code, Str $message) is Event
+    method handle_connect_error(Str $action, Int $code, Str $message, @args) is Event
     {
-        warn "Received connect error: Action $action, Code $code, Message $message"
+        warn "Received connect error: Action $action, Code $code, Message $message: @args"
             if $self->options->{'debug'};
     }
 
