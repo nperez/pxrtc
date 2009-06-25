@@ -201,15 +201,15 @@ handle_on_connect is the SuccessEvent of the SocketFactory instantiated in _star
         $self->delete_socket_factory($id);
     }
 
-=method handle_connect_error(Str $action, Int $code, Str $message) is Event
+=method handle_connect_error(Str $action, Int $code, Str $message, WheelID $id) is Event
 
 handle_connect_error is the FailureEvent of the SocketFactory
 
 =cut
 
-    method handle_connect_error(Str $action, Int $code, Str $message, @args) is Event
+    method handle_connect_error(Str $action, Int $code, Str $message, WheelID $id) is Event
     {
-        warn "Received connect error: Action $action, Code $code, Message $message: @args"
+        warn "Received connect error: Action $action, Code $code, Message $message from $id"
             if $self->options->{'debug'};
     }
 
@@ -221,7 +221,7 @@ handle_socket_error is the ErrorEvent of each POE::Wheel::ReadWrite instantiated
 
     method handle_socket_error(Str $action, Int $code, Str $message, WheelID $id) is Event
     {
-        warn "Received socket error: Action $action, Code $code, Message $message"
+        warn "Received socket error: Action $action, Code $code, Message $message from $id"
             if $self->options->{'debug'};
     }
 
