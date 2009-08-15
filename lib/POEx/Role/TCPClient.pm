@@ -4,8 +4,9 @@ package POEx::Role::TCPClient;
 
 use MooseX::Declare;
 
-role POEx::Role::TCPClient with POEx::Role::SessionInstantiation
+role POEx::Role::TCPClient 
 {
+    with 'POEx::Role::SessionInstantiation';
     use MooseX::AttributeHelpers;
     use POEx::Types(':all');
     use MooseX::Types::Moose(':all');

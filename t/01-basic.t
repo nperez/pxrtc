@@ -1,9 +1,9 @@
-use Test::More('tests', 7);
+use Test::More;
 
 use POE;
 use MooseX::Declare;
 
-class Client with POEx::Role::TCPClient
+class Client 
 {
     use MooseX::Types::Moose(':all');
     use POEx::Types(':all');
@@ -19,6 +19,8 @@ class Client with POEx::Role::TCPClient
         $self->yield('shutdown');
     }
 
+    with 'POEx::Role::TCPClient';
+    
     after shutdown is Event
     {
         pass('shutdown called');
@@ -73,3 +75,4 @@ Client->new(alias => 'foo', options => { debug => 1, trace => 1});
 POE::Kernel->post('foo', 'connect', remote_address => '127.0.0.1', remote_port => 54444, tag => {one => 1, two => [2]});
 
 POE::Kernel->run();
+done_testing();

@@ -1,8 +1,6 @@
-use Test::More('tests', 1);
+use Test::More;
 
-BEGIN
-{
-    use_ok('POEx::Role::TCPClient');
-}
+use_ok('POEx::Role::TCPClient');
+done_testing();
 
 0;
