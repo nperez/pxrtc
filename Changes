@@ -1,4 +1,7 @@
 Revision history for {{ $dist->name }} {{ $dist->version }}
 
 {{ $NEXT }}
+        Adjust accessors for wheels such that has_wheel is exists and count_wheels is count
+
+0.092280  2009-08-16 21:11:35 UTC
         Initial release
