@@ -3,6 +3,8 @@ use Test::More;
 use POE;
 use MooseX::Declare;
 
+my $port = int(rand(10000)) + 50000;
+
 class Client 
 {
     use MooseX::Types::Moose(':all');
@@ -72,7 +74,8 @@ class Client
 }
 
 Client->new(alias => 'foo', options => { debug => 1, trace => 1});
-POE::Kernel->post('foo', 'connect', remote_address => '127.0.0.1', remote_port => 54444, tag => {one => 1, two => [2]});
+POE::Kernel->post('foo', 'connect', remote_address => '127.0.0.1', remote_port => $port, tag => {one => 1, two => [2]});
 
 POE::Kernel->run();
 done_testing();
+0;
