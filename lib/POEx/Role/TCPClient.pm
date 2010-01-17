@@ -7,7 +7,6 @@ use MooseX::Declare;
 role POEx::Role::TCPClient 
 {
     with 'POEx::Role::SessionInstantiation';
-    use MooseX::AttributeHelpers;
     use POEx::Types(':all');
     use MooseX::Types::Moose(':all');
     use POE::Wheel::ReadWrite;
@@ -29,71 +28,70 @@ it came.
 
     requires 'handle_inbound_data';
 
-=attr socket_factories metaclass: Collection::Hash, isa: HashRef[Object]
+=attr socket_factories traits: ['Hash'], isa: HashRef[Object]
 
 The POE::Wheel::SocketFactory objects created in connect are stored here and 
 managed via the following provides:
 
-    provides    =>
+    handles     =>
     {
-        get     => 'get_socket_factory',
-        set     => 'set_socket_factory',
-        delete  => 'delete_socket_factory',
-        count   => 'has_socket_factories',
-        exists  => 'has_socket_factory',
+        'get_socket_factory'       => 'get',
+        'set_socket_factory'       => 'set',
+        'delete_socket_factory'    => 'delete',
+        'has_socket_factories'     => 'count',
+        'has_socket_factory'       => 'exists',
     }
 
 =cut
 
     has socket_factories =>
     (
-        metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
         isa         => HashRef[Object],
+        traits      => ['Hash'],
         lazy        => 1,
         default     => sub { {} },
         clearer     => 'clear_socket_factories',
-        provides    =>
+        handles     =>
         {
-            get     => 'get_socket_factory',
-            set     => 'set_socket_factory',
-            delete  => 'delete_socket_factory',
-            count   => 'has_socket_factories',
-            exists  => 'has_socket_factory',
+            'get_socket_factory'       => 'get',
+            'set_socket_factory'       => 'set',
+            'delete_socket_factory'    => 'delete',
+            'has_socket_factories'     => 'count',
+            'has_socket_factory'       => 'exists',
         }
     );
 
-=attr wheels metaclass: Collection::Hash, isa: HashRef, clearer: clear_wheels
+=attr wheels traits: ['Hash'], isa: HashRef, clearer: clear_wheels
 
 When connections are finished, a POE::Wheel::ReadWrite object is created and 
 stored in this attribute, keyed by WheelID. Wheels may be accessed via the
-following provided methods. See MooseX::AttributeHelpers::Collection::Hash
-for more details.
+following provided methods. 
 
-    provides    =>
+    handles    =>
     {
-        get     => 'get_wheel',
-        set     => 'set_wheel',
-        delete  => 'delete_wheel',
-        count   => 'count_wheels',
-        exists  => 'has_wheel',
+        'get_wheel'    => 'get',
+        'set_wheel'    => 'set',
+        'delete_wheel' => 'delete',
+        'count_wheels' => 'count',
+        'has_wheel'    => 'exists',
     }
 
 =cut
 
     has wheels =>
     (
-        metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
         isa         => HashRef[Object],
+        traits      => ['Hash'],
         lazy        => 1,
         default     => sub { {} },
         clearer     => 'clear_wheels',
-        provides    =>
+        handles    =>
         {
-            get     => 'get_wheel',
-            set     => 'set_wheel',
-            delete  => 'delete_wheel',
-            count   => 'count_wheels',
-            exists  => 'has_wheel',
+            'get_wheel'    => 'get',
+            'set_wheel'    => 'set',
+            'delete_wheel' => 'delete',
+            'count_wheels' => 'count',
+            'has_wheel'    => 'exists',
         }
     );
 
@@ -129,31 +127,22 @@ for each connection completed.
 This stores any arbitrary user data passed to connect keyed by the socket
 factory ID. Handy to match up multiple connects for composers.
 
-    provides    =>
-    {
-        get     => 'get_connection_tag',
-        set     => 'set_connection_tag',
-        delete  => 'delete_connection_tag',
-        count   => 'has_connection_tags',
-        exists  => 'has_connection_tag',
-    }
-
 =cut
 
     has connection_tags =>
     (
-        metaclass   => 'MooseX::AttributeHelpers::Collection::Hash',
         isa         => HashRef[Ref],
+        traits      => ['Hash'],
         lazy        => 1,
         default     => sub { {} },
         clearer     => 'clear_connection_tags',
-        provides    =>
+        handles     =>
         {
-            get     => 'get_connection_tag',
-            set     => 'set_connection_tag',
-            delete  => 'delete_connection_tag',
-            count   => 'has_connection_tags',
-            exists  => 'has_connection_tag',
+            'get_connection_tag'       => 'get',
+            'set_connection_tag'       => 'set',
+            'delete_connection_tag'    => 'delete',
+            'has_connection_tags'      => 'count',
+            'has_connection_tag'       => 'exists',
         }
 
     );

@@ -1,6 +1,9 @@
-Revision history for {{ $dist->name }} {{ $dist->version }}
+Revision history for POEx-Role-TCPClient: {{ $dist->version }}
 
 {{ $NEXT }}
+        Switch to using native attribute traits in moose
+
+0.092340  2009-08-22 19:06:06 UTC
         Adjust accessors for wheels such that has_wheel is exists and count_wheels is count
 
 0.092280  2009-08-16 21:11:35 UTC
