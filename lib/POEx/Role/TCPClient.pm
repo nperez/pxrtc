@@ -1,4 +1,4 @@
-{package POEx::Role::TCPClient;}
+package POEx::Role::TCPClient;
 
 #ABSTRACT: A Moose Role that provides TCPClient behavior
 
@@ -19,7 +19,9 @@ role POEx::Role::TCPClient
 
 =head2 METHODS
 
-=head3 handle_inbound_data($data, WheelID $id) is Event
+=head3 handle_inbound_data
+
+    ($data, WheelID $id) is Event
 
 This required method will be passed the data received, and from which wheel 
 it came. 
@@ -78,7 +80,7 @@ following provided methods.
         has_socket_factory => 'exists',
     }
 
-=attrbute_protected wheels 
+=attribute_protected wheels 
 
     traits: Hash, isa: HashRef, clearer: clear_wheels
 
