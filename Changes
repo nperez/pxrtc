@@ -1,6 +1,8 @@
 Revision history for POEx-Role-TCPClient: {{ $dist->version }}
 
 {{ $NEXT }}
+
+1.100910  2010-04-01 01:56:28 America/Chicago
         Switch to using native attribute traits in moose
 
 0.092340  2009-08-22 19:06:06 UTC
