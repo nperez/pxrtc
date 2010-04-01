@@ -1,4 +1,4 @@
-package POEx::Role::TCPClient;
+{package POEx::Role::TCPClient;}
 
 #ABSTRACT: A Moose Role that provides TCPClient behavior
 
@@ -28,18 +28,19 @@ it came.
 
     requires 'handle_inbound_data';
 
-=attr socket_factories traits: ['Hash'], isa: HashRef[Object]
+=attribute_protected socket_factories
+
+    traits:Hash, isa: HashRef[Object]
 
 The POE::Wheel::SocketFactory objects created in connect are stored here and 
 managed via the following provides:
 
-    handles     =>
     {
-        'get_socket_factory'       => 'get',
-        'set_socket_factory'       => 'set',
-        'delete_socket_factory'    => 'delete',
-        'has_socket_factories'     => 'count',
-        'has_socket_factory'       => 'exists',
+        get_socket_factory => 'get',
+        set_socket_factory => 'set',
+        delete_socket_factory => 'delete',
+        has_socket_factories => 'count',
+        has_socket_factory => 'exists',
     }
 
 =cut
@@ -61,19 +62,36 @@ managed via the following provides:
         }
     );
 
-=attr wheels traits: ['Hash'], isa: HashRef, clearer: clear_wheels
+=attribute_protected wheels
+
+    traits: Hash, isa: HashRef, clearer: clear_wheels
 
 When connections are finished, a POE::Wheel::ReadWrite object is created and 
 stored in this attribute, keyed by WheelID. Wheels may be accessed via the
 following provided methods. 
 
-    handles    =>
     {
-        'get_wheel'    => 'get',
-        'set_wheel'    => 'set',
-        'delete_wheel' => 'delete',
-        'count_wheels' => 'count',
-        'has_wheel'    => 'exists',
+        get_socket_factory => 'get',
+        set_socket_factory => 'set',
+        delete_socket_factory => 'delete',
+        has_socket_factories => 'count',
+        has_socket_factory => 'exists',
+    }
+
+=attrbute_protected wheels 
+
+    traits: Hash, isa: HashRef, clearer: clear_wheels
+
+When connections are finished, a POE::Wheel::ReadWrite object is created and 
+stored in this attribute, keyed by WheelID. Wheels may be accessed via the
+following provided methods.
+
+    {
+        get_wheel => 'get',
+        set_wheel => 'set',
+        delete_wheel => 'delete',
+        count_wheels => 'count',
+        has_wheel => 'exists',
     }
 
 =cut
@@ -85,17 +103,19 @@ following provided methods.
         lazy        => 1,
         default     => sub { {} },
         clearer     => 'clear_wheels',
-        handles    =>
+        handles     =>
         {
-            'get_wheel'    => 'get',
-            'set_wheel'    => 'set',
-            'delete_wheel' => 'delete',
-            'count_wheels' => 'count',
-            'has_wheel'    => 'exists',
+            get_wheel => 'get',
+            set_wheel => 'set',
+            delete_wheel => 'delete',
+            count_wheels => 'count',
+            has_wheel => 'exists',
         }
     );
 
-=attr last_wheel is: rw, isa: WheelID
+=attribute_protected last_wheel
+
+    is: rw, isa: WheelID
 
 This holds the last ID created from the handle_on_connect method. Handy if the
 protocol requires client initiation.
@@ -108,10 +128,12 @@ protocol requires client initiation.
         isa         => WheelID,
     );
 
-=attr filter is: rw, isa: Filter
+=attribute_protected filter
+
+    is: rw, isa: Filter
 
 This stores the filter that is used when constructing wheels. It will be cloned
-for each connection completed.
+for each connection completed. By default, instantiates a POE::Filter::Line object.
 
 =cut
 
@@ -122,10 +144,20 @@ for each connection completed.
         default     => sub { POE::Filter::Line->new() }
     );
 
-=attr connection_tags metaclass: Collection::Hash, is: ro, isa: HashRef[Ref]
+=attribute_protected connection_tags
+
+    traits: Hash, is: ro, isa: HashRef[Ref]
 
 This stores any arbitrary user data passed to connect keyed by the socket
 factory ID. Handy to match up multiple connects for composers.
+
+    {
+        get_connection_tag => 'get',
+        set_connection_tag => 'set',
+        delete_connection_tag => 'delete',
+        has_connection_tags => 'count',
+        has_connection_tag => 'exists',
+    }
 
 =cut
 
@@ -138,16 +170,18 @@ factory ID. Handy to match up multiple connects for composers.
         clearer     => 'clear_connection_tags',
         handles     =>
         {
-            'get_connection_tag'       => 'get',
-            'set_connection_tag'       => 'set',
-            'delete_connection_tag'    => 'delete',
-            'has_connection_tags'      => 'count',
-            'has_connection_tag'       => 'exists',
+            get_connection_tag => 'get',
+            set_connection_tag => 'set',
+            delete_connection_tag => 'delete',
+            has_connection_tags => 'count',
+            has_connection_tag => 'exists',
         }
 
     );
 
-=method connect(Str :$remote_address, Int :$remote_port, Ref :$tag?) is Event
+=method_public connect
+
+    (Str :$remote_address, Int :$remote_port, Maybe[Ref] :$tag) is Event
 
 connect is used to initiate a connection to a remote source. It accepts two 
 named arguments that both required, remote_address and remote_port. They are 
@@ -172,7 +206,9 @@ connection_tags and keyed by the socket factory's ID.
         $self->set_connection_tag($sfactory->ID, $tag) if defined($tag);
     }
 
-=method handle_on_connect(GlobRef $socket, Str $address, Int $port, WheelID $id) is Event
+=method_protected handle_on_connect
+
+    (GlobRef $socket, Str $address, Int $port, WheelID $id) is Event
 
 handle_on_connect is the SuccessEvent of the SocketFactory instantiated in _start. 
 
@@ -193,7 +229,9 @@ handle_on_connect is the SuccessEvent of the SocketFactory instantiated in _star
         $self->delete_socket_factory($id);
     }
 
-=method handle_connect_error(Str $action, Int $code, Str $message, WheelID $id) is Event
+=method_protected handle_connect_error
+
+    (Str $action, Int $code, Str $message, WheelID $id) is Event
 
 handle_connect_error is the FailureEvent of the SocketFactory
 
@@ -205,7 +243,9 @@ handle_connect_error is the FailureEvent of the SocketFactory
             if $self->options->{'debug'};
     }
 
-=method handle_socket_error(Str $action, Int $code, Str $message, WheelID $id) is Event
+=method_protected handle_socket_error
+
+    (Str $action, Int $code, Str $message, WheelID $id) is Event
 
 handle_socket_error is the ErrorEvent of each POE::Wheel::ReadWrite instantiated.
 
@@ -217,7 +257,9 @@ handle_socket_error is the ErrorEvent of each POE::Wheel::ReadWrite instantiated
             if $self->options->{'debug'};
     }
 
-=method shutdown() is Event
+=method_public shutdown()
+
+    is Event
 
 shutdown unequivically terminates the TCPClient by clearing all wheels and 
 aliases, forcing POE to garbage collect the session.
